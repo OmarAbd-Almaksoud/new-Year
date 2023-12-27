@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      @font-face {
+        font-family: myFirstFont;
+        src: url("./Cairo/Cairo-VariableFont_slnt\,wght.ttf");
+      }
+      * {
+        font-family: myFirstFont !important;
+      }
+      body,
+      html {
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+      }
+      #canvas {
+        height: 100vh;
+        width: 100vw;
+        background-color: #283a97;
+      }
+      #logo {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
+        width: 20vw;
+      }
+      #text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: "Arial", sans-serif;
+        font-size: 24px;
+        color: white;
+        text-align: center;
+        z-index: 1;
+      }
+      #balloon-container {
+        height: 100vh;
+
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+        overflow: hidden;
+        transition: opacity 500ms;
+        background-image: url("./test.jpg");
+        background-size: cover;
+        filter: grayscale(15%);
+      }
+
+      .balloon {
+        height: 125px;
+        width: 105px;
+        border-radius: 75% 75% 70% 70%;
+        position: relative;
+      }
+
+      .balloon:before {
+        content: "";
+        height: 75px;
+        width: 1px;
+        padding: 1px;
+        background-color: #fdfd96;
+        display: block;
+        position: absolute;
+        top: 125px;
+        left: 0;
+        right: 0;
+        margin: auto;
+      }
+
+      .balloon:after {
+        content: "▲";
+        text-align: center;
+        display: block;
+        position: absolute;
+        color: inherit;
+        top: 120px;
+        left: 0;
+        right: 0;
+        margin: auto;
+      }
+
+      @keyframes float {
+        from {
+          transform: translateY(100vh);
+          opacity: 1;
+        }
+        to {
+          transform: translateY(-300vh);
+          opacity: 0;
+        }
+      }
+
+
+
+      /* Extra small devices (phones, 600px and down) */
+   @media only screen and (max-width: 600px) {
+    #logo {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
+        width: 30vw;
+        height: 5vh;
+      }
+    #text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 18px;
+        color: white;
+        text-align: center;
+        z-index: 1;
+      }
+   }
+
+   /* Small devices (portrait tablets and large phones, 600px and up) */
+   @media only screen and (min-width: 600px) {
+    #logo {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
+        width: 30vw;
+        height: 5vh;
+      }
+    #text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 20px;
+        color: white;
+        text-align: center;
+        z-index: 1;
+      }
+      
+   }
+
+   /* Medium devices (landscape tablets, 768px and up) */
+   @media only screen and (min-width: 768px) {
+    #logo {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
+        width: 25vw;
+        height: 7vh;
+      }
+    #text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 22px;
+        color: white;
+        text-align: center;
+        z-index: 1;
+      }
+   }
+
+   /* Large devices (laptops/desktops, 992px and up) */
+   @media only screen and (min-width: 992px) {
+    #logo {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
+        width: 20vw;
+        height: 7vh;
+      }
+    #text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        color: white;
+        text-align: center;
+        z-index: 1;
+      }
+   }
+   
+
+   /* Extra large devices (large laptops and desktops, 1200px and up) */
+   @media only screen and (min-width: 1200px) {
+    #logo {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
+        width: 20vw;
+        height: 7vh;
+      }
+      #text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: "Arial", sans-serif;
+        font-size: 24px;
+        color: white;
+        text-align: center;
+        z-index: 1;
+      }
+   }
+    </style>
+  </head>
+  <body>
+    <img id="logo" src="./Artboard 1 copy.png" alt="Logo" />
+    <div id="balloon-container">
+      <canvas id="canvas"> </canvas>
+      <div id="text">
+        <h1>نجاحنا من نجاحكم</h1>
+        <h1>مستمرون بكم</h1>
+        <h1>كل عام وانتم بخير</h1>
+        <h1>2024</h1>
+      </div>
+    </div>
+    <script>
+      const canvas = document.getElementById("canvas");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      var ctx = canvas.getContext("2d");
+      function Firework(x, y, height, yVol, R, G, B) {
+        this.x = x;
+        this.y = y;
+        this.yVol = yVol;
+        this.height = height;
+        this.R = R;
+        this.G = G;
+        this.B = B;
+        this.radius = 2;
+        this.boom = false;
+        var boomHeight = Math.floor(Math.random() * 200) + 50;
+        this.draw = function () {
+          ctx.fillStyle = "rgba(" + R + "," + G + "," + B + ")";
+          ctx.strokeStyle = "rgba(" + R + "," + G + "," + B + ")";
+          ctx.beginPath();
+          //   ctx.arc(this.x,boomHeight,this.radius,Math.PI * 2,0,false);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, 3, Math.PI * 2, 0, false);
+          ctx.fill();
+        };
+        this.update = function () {
+          this.y -= this.yVol;
+          if (this.radius < 20) {
+            this.radius += 0.35;
+          }
+          if (this.y < boomHeight) {
+            this.boom = true;
+
+            for (var i = 0; i < 120; i++) {
+              particleArray.push(
+                new Particle(
+                  this.x,
+                  this.y,
+                  // (Math.random() * 2) + 0.5//
+                  Math.random() * 2 + 1,
+                  this.R,
+                  this.G,
+                  this.B,
+                  1
+                )
+              );
+            }
+          }
+          this.draw();
+        };
+        this.update();
+      }
+
+      window.addEventListener("click", (e) => {
+        var x = e.clientX;
+        var y = canvas.height;
+        var R = Math.floor(Math.random() * 255);
+        var G = Math.floor(Math.random() * 255);
+        var B = Math.floor(Math.random() * 255);
+        var height = Math.floor(Math.random() * 20) + 10;
+        fireworkArray.push(new Firework(x, y, height, 5, R, G, B));
+      });
+
+      function Particle(x, y, radius, R, G, B, A) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.R = R;
+        this.G = G;
+        this.B = B;
+        this.A = A;
+        this.timer = 0;
+        this.fade = false;
+
+        // Change random spread
+        this.xVol = Math.random() * 10 - 4;
+        this.yVol = Math.random() * 10 - 4;
+
+        console.log(this.xVol, this.yVol);
+        this.draw = function () {
+          //   ctx.globalCompositeOperation = "lighter"
+          ctx.fillStyle = "rgba(" + R + "," + G + "," + B + "," + this.A + ")";
+          ctx.save();
+          ctx.beginPath();
+          // ctx.fillStyle = "white"
+          ctx.globalCompositeOperation = "screen";
+          ctx.arc(this.x, this.y, this.radius, Math.PI * 2, 0, false);
+          ctx.fill();
+
+          ctx.restore();
+        };
+        this.update = function () {
+          this.x += this.xVol;
+          this.y += this.yVol;
+
+          // Comment out to stop gravity.
+          if (this.timer < 200) {
+            this.yVol += 0.12;
+          }
+          this.A -= 0.02;
+          if (this.A < 0) {
+            this.fade = true;
+          }
+          this.draw();
+        };
+        this.update();
+      }
+
+      var fireworkArray = [];
+      var particleArray = [];
+      for (var i = 0; i < 6; i++) {
+        var x = Math.random() * canvas.width;
+        var y = canvas.height;
+        var R = Math.floor(Math.random() * 255);
+        var G = Math.floor(Math.random() * 255);
+        var B = Math.floor(Math.random() * 255);
+        var height = Math.floor(Math.random() * 20) + 10;
+        fireworkArray.push(new Firework(x, y, height, 5, R, G, B));
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        // ctx.clearRect(0,0,canvas.width,canvas.height)
+        ctx.fillStyle = "#283A97";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        for (var i = 0; i < fireworkArray.length; i++) {
+          fireworkArray[i].update();
+        }
+        for (var j = 0; j < particleArray.length; j++) {
+          particleArray[j].update();
+        }
+        if (fireworkArray.length < 4) {
+          var x = Math.random() * canvas.width;
+          var y = canvas.height;
+          var height = Math.floor(Math.random() * 20);
+          var yVol = 5;
+          var R = Math.floor(Math.random() * 255);
+          var G = Math.floor(Math.random() * 255);
+          var B = Math.floor(Math.random() * 255);
+          fireworkArray.push(new Firework(x, y, height, yVol, R, G, B));
+        }
+
+        fireworkArray = fireworkArray.filter((obj) => !obj.boom);
+        particleArray = particleArray.filter((obj) => !obj.fade);
+      }
+      animate();
+
+      window.addEventListener("resize", (e) => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+
+      const balloonContainer = document.getElementById("balloon-container");
+
+      function randomBallon(num) {
+        return Math.floor(Math.random() * num);
+      }
+
+      function getRandomStyles() {
+        var r = randomBallon(255);
+        var g = randomBallon(255);
+        var b = randomBallon(255);
+        var mt = randomBallon(200);
+        var ml = randomBallon(50);
+        var dur = randomBallon(5) + 5;
+        return `
+  background-color: rgba(${r},${g},${b},0.7);
+  color: rgba(${r},${g},${b},0.7); 
+  box-shadow: inset -7px -3px 10px rgba(${r - 10},${g - 10},${b - 10},0.7);
+  margin: ${mt}px 0 0 ${ml}px;
+  animation: float ${dur}s ease-in infinite
+  `;
+      }
+
+      function createBalloons(num) {
+        for (var i = num; i > 0; i--) {
+          var balloon = document.createElement("div");
+          balloon.className = "balloon";
+          balloon.style.cssText = getRandomStyles();
+          balloonContainer.append(balloon);
+        }
+      }
+
+      function removeBalloons() {
+        balloonContainer.style.opacity = 0;
+        setTimeout(() => {
+          balloonContainer.remove();
+        }, 500);
+      }
+
+      window.addEventListener("load", () => {
+        createBalloons(30);
+      });
+    </script>
+  </body>
+</html>
